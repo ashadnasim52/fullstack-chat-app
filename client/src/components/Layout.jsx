@@ -1,10 +1,17 @@
 import React from "react";
 import Header from "./Header";
 
-const Layout = () => {
+const Layout = ({ children }) => {
 	return (
-		<div>
+		<div className="bg-darkblackcolor relative">
 			<Header />
+			<div
+				style={{
+					height: "92vh",
+				}}
+			>
+				{children}
+			</div>
 		</div>
 	);
 };

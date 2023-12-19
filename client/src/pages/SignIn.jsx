@@ -1,16 +1,42 @@
-// src/components/SignIn.js
-import React from "react";
+import React, { useState } from "react";
 import animationData from "../assets/login.json";
 import Lottie from "lottie-react";
-import { colors } from "../utils/constant";
-import { Link } from "react-router-dom";
+import { SOMETHING_WENT_WRONG, colors } from "../utils/constant";
+import { SIGNIN } from "../utils/api";
+import { showToast } from "../utils/funcs";
+import { logger } from "../utils/logger";
+import axiosInstance from "../utils/axios";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+	const nav = useNavigate();
+
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const _handleSignIn = async () => {
+		try {
+			const { data } = await axiosInstance.post(SIGNIN, {
+				email,
+				password,
+			});
+			if (data?.error) return showToast(data?.message || SOMETHING_WENT_WRONG);
+			logger.log({
+				data: data,
+			});
+			if (data?.token) {
+				setSession(data?.token);
+				nav("/");
+			}
+		} catch (error) {
+			console.log({ error });
+			showToast(error?.response?.message || SOMETHING_WENT_WRONG);
+		}
+	};
 	return (
-		<div className="flex h-screen bg-darkblack">
+		<div className="flex h-screen bg-darkblackcolor">
 			{/* Left side with image and text */}
 			<div
-				className={`flex-1 bg-darkblack p-8 flex items-center justify-center`}
+				className={`flex-1 bg-darkblackcolor p-8 flex items-center justify-center`}
 			>
 				<div className="text-white text-center">
 					<Lottie animationData={animationData} loop={true} />
@@ -23,7 +49,7 @@ const SignIn = () => {
 
 			{/* Right side with sign-in card */}
 			<div className="flex-1 flex items-center justify-center p-8">
-				<div className="bg-secondary text-white p-8 rounded rounded-md shadow-md w-96">
+				<div className="bg-secondarycolor text-white p-8 rounded rounded-md shadow-md w-96">
 					<h2 className="text-2xl font-bold mb-6">Sign In</h2>
 					<div className="mb-4">
 						<label
@@ -34,9 +60,11 @@ const SignIn = () => {
 						</label>
 						<input
 							type="email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
 							id="email"
 							name="email"
-							className="w-full border rounded-md py-2 px-3"
+							className="w-full border rounded-md py-2 px-3 text-black"
 						/>
 					</div>
 					<div className="mb-6">
@@ -49,11 +77,16 @@ const SignIn = () => {
 						<input
 							type="password"
 							id="password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
 							name="password"
-							className="w-full border rounded-md py-2 px-3"
+							className="w-full border rounded-md py-2 px-3 text-black"
 						/>
 					</div>
-					<button className="bg-accent text-white rounded-md py-2 px-4 w-full">
+					<button
+						className="bg-accentcolor text-white rounded-md py-2 px-4 w-full"
+						onClick={_handleSignIn}
+					>
 						Sign In
 					</button>
 					<p className="text-white mt-4 ">
