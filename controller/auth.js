@@ -41,6 +41,7 @@ const signIn = async (req, res) => {
 			email: user.email,
 			_id: user._id,
 			userName: user.userName,
+			avatar: user.avatar,
 		};
 		// JWT TOKEN SIGN
 		const token = jwt.sign(data, secret, {
@@ -93,6 +94,7 @@ const signUp = async (req, res) => {
 			userName: userName,
 			email: email,
 			isActive: true,
+			avatar: `https://robohash.org/${userName}.png`,
 		}).save();
 
 		console.log(user);

@@ -1,101 +1,167 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-function generateRandomLastSeen() {
-	const hoursAgo = Math.floor(Math.random() * 24);
-	return `Last seen ${
-		hoursAgo === 0
-			? "just now"
-			: `${hoursAgo} ${hoursAgo === 1 ? "hour" : "hours"} ago`
-	}`;
-}
-const generateParticipants = () => {
-	const participants = [];
-	for (let i = 1; i <= 50; i++) {
-		participants.push({
-			id: i,
-			name: `Participant ${i}`,
-			avatar: `/path-to-avatar${i}.jpg`, // Replace with the actual path
-			lastSeen: generateRandomLastSeen(),
-		});
-	}
-	return participants;
-};
+import { useParams } from "react-router-dom";
+import { SINGLE_GROUP_DETAIL } from "../utils/api";
+import { showToast } from "../utils/funcs";
+import { SOMETHING_WENT_WRONG, TOKEN } from "../utils/constant";
+import { logger } from "../utils/logger";
+import axiosInstance from "../utils/axios";
+import moment from "moment";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
-const participantsData = generateParticipants();
-
-const generateRandomChatMessage = () => {
-	const messages = [
-		"Hi there!",
-		"How are you doing?",
-		"This is a sample message.",
-		"Random message!",
-		"Nice to meet you!",
-	];
-	const randomIndex = Math.floor(Math.random() * messages.length);
-	return messages[randomIndex];
-};
-
-const generateRandomTimestamp = () => {
-	const hoursAgo = Math.floor(Math.random() * 24);
-	return `Last seen ${
-		hoursAgo === 0
-			? "just now"
-			: `${hoursAgo} ${hoursAgo === 1 ? "hour" : "hours"} ago`
-	}`;
-};
-
-const generateRandomChat = () => {
-	return {
-		id: Date.now(),
-		sender: Math.random() < 0.5 ? "user" : "participant",
-		message: generateRandomChatMessage(),
-		timestamp: generateRandomTimestamp(),
-	};
-};
-
-const generateInitialChats = () => {
-	const initialChats = [];
-	for (let i = 1; i <= 10; i++) {
-		initialChats.push(generateRandomChat());
-	}
-	return initialChats;
-};
+const URL = import.meta.env.VITE_BASE_URL;
+const socket = io(URL, {
+	autoConnect: false,
+	auth: { token: `${localStorage.getItem(TOKEN)}` }, // Replace with the actual JWT token
+});
 const Chat = () => {
-	const [chats, setChats] = useState(generateInitialChats());
+	const { isAuthenticated, isLoading, authData } = useSelector(
+		(state) => state.global
+	);
+	const [message, setMessage] = useState("");
+	const [groupData, setGroupData] = useState([]);
+	const [chats, setChats] = useState([]);
 	const [newMessage, setNewMessage] = useState("");
+	let { id } = useParams(); // Unpacking and retrieve id
+	// const handleSendMessage = () => {
+	// 	const newChat = {
+	// 		id: Date.now(),
+	// 		sender: "user",
+	// 		message: newMessage,
+	// 		timestamp: generateRandomTimestamp(),
+	// 	};
+	// 	setChats((prevChats) => [...prevChats, newChat]);
+	// 	setNewMessage("");
+	// };
+	const _getGroupData = async () => {
+		try {
+			const { data } = await axiosInstance.get(`${SINGLE_GROUP_DETAIL}/${id}`);
+			logger.log({
+				data: data,
+			});
+			setGroupData(data?.payload);
+			setChats(data?.payload?.chats);
+		} catch (error) {
+			console.log({ error });
+			showToast(error?.response?.message || SOMETHING_WENT_WRONG);
+		}
+	};
+	const [participants, setParticipants] = useState([]);
 
-	const handleSendMessage = () => {
-		const newChat = {
-			id: Date.now(),
-			sender: "user",
-			message: newMessage,
-			timestamp: generateRandomTimestamp(),
-		};
-		setChats((prevChats) => [...prevChats, newChat]);
-		setNewMessage("");
+	// useEffect(() => {
+	// 	socket.on("participantsUpdated", (updatedParticipants) => {
+	// 		console.log({ updatedParticipants });
+	// 		setParticipants(updatedParticipants.members);
+	// 	});
+	// }, []);
+
+	useEffect(() => {
+		socket.on("participantsUpdated", (updatedParticipants) => {
+			console.log({ updatedParticipants });
+			setParticipants(updatedParticipants.members);
+		});
+
+		socket.on("groupMessage", (data) => {
+			console.log("groupMessage");
+			console.log(data);
+			setChats([...chats, data]);
+		});
+	}, [chats]);
+
+	useEffect(() => {
+		_getGroupData();
+	}, []);
+
+	// const [isConnected, setIsConnected] = useState(socket.connected);
+	// const [fooEvents, setFooEvents] = useState([]);
+
+	// useEffect(() => {
+	// 	function onConnect() {
+	// 		console.log("Connected");
+	// 		setIsConnected(true);
+	// 	}
+
+	// 	function onDisconnect() {
+	// 		setIsConnected(false);
+	// 	}
+
+	// 	function onFooEvent(value) {
+	// 		setFooEvents((previous) => [...previous, value]);
+	// 	}
+
+	// 	socket.connect();
+
+	// 	socket.on("connect", onConnect);
+	// 	socket.on("disconnect", onDisconnect);
+	// 	socket.on("foo", onFooEvent);
+
+	// 	return () => {
+	// 		socket.off("connect", onConnect);
+	// 		socket.off("disconnect", onDisconnect);
+	// 		socket.off("foo", onFooEvent);
+	// 	};
+	// }, []);
+
+	// useEffect(() => {
+	// 	// Handle incoming group messages
+	// 	socket.on("messages", (data) => {
+	// 		console.log({ messages });
+	// 		setMessages([...messages, data]);
+	// 	});
+
+	// 	// Cleanup when component unmounts
+	// 	return () => {
+	// 		socket.disconnect();
+	// 	};
+	// }, [messages]);
+
+	const joinGroup = () => {
+		socket.connect();
+		// Emit joinGroup event to server
+		socket.emit("joinGroup", id);
 	};
 
+	// const sendMessage = () => {
+	// 	// Emit groupMessage event to server
+
+	// 	try {
+	// 		socket.emit("groupMessage", {
+	// 			groupId: id,
+	// 			message: "HI",
+	// 		});
+	// 	} catch (error) {
+	// 		console.log({ error });
+	// 	}
+	// };
+
+	const sendMessage = () => {
+		socket.emit("groupMessage", { groupId: id, message: message });
+		setMessage("");
+	};
 	return (
 		<Layout>
 			<div className="flex h-100 bg-secondarycolor">
 				{/* Participants List (Left Side) */}
 				<div className="w-1/4 bg-darkblackcolor text-white p-4 border-r h-100 overflow-y-auto">
 					<h2 className="text-xl font-bold mb-4">Participants</h2>
+					<button onClick={joinGroup}>Join Group</button>
+					{/* <button onClick={sendMessage}>Send Message</button> */}
 
-					{participantsData.map((participant) => (
+					{participants.map((participant) => (
 						<div className="flex items-center mb-4">
 							<Avatar className="h-9 w-9">
 								<AvatarImage
-									src="https://avatars.githubusercontent.com/u/38835999?v=4"
-									alt="@shadcn"
+									src={participant.avatar}
+									alt={participant.userName}
 								/>
 								<AvatarFallback>SC</AvatarFallback>
 							</Avatar>
 							<div className=" pl-4">
-								<p className="font-bold text-white">Participant 1</p>
+								<p className="font-bold text-white">{participant.userName}</p>
 								<p className="text-gray-500 text-sm">
-									Last seen 30 minutes ago
+									{moment(participant.lastSeen).fromNow()}
 								</p>
 							</div>
 						</div>
@@ -109,23 +175,31 @@ const Chat = () => {
 							<div
 								key={chat.id}
 								className={`flex ${
-									chat.sender === "user" ? "justify-end" : "justify-start"
+									chat?.sender === authData?._id
+										? "justify-end"
+										: "justify-start"
 								} items-center mb-2`}
 							>
-								{chat.sender === "participant" && (
+								{chat?.sender !== authData?._id && (
 									<img
-										src="/path-to-participant-avatar.jpg" // Replace with the actual path
+										src={chat?.avatar} // Replace with the actual path
 										alt="Participant Avatar"
 										className="w-8 h-8 rounded-full mr-2"
 									/>
 								)}
-								<div
-									className={`bg-${
-										chat.sender === "user" ? "blue-500" : "green-500"
-									} text-white p-2 rounded`}
-								>
-									<p>{chat.message}</p>
-									<p className="text-xs text-gray-300">{chat.timestamp}</p>
+								<div>
+									<p
+										className={`${
+											chat.sender === authData?._id
+												? "bg-darkblackcolor text-white self-end"
+												: "bg-accentcolor text-white"
+										} p-2 rounded`}
+									>
+										{chat.message}
+									</p>
+									<p className="text-xs text-gray-300 ml-2 mt-1">
+										{moment(chat.date).format("hh:mm DD/MM/YYYY")}
+									</p>
 								</div>
 							</div>
 						))}
@@ -139,12 +213,12 @@ const Chat = () => {
 							type="text"
 							placeholder="Type your message..."
 							className="flex-1 p-4 border rounded-l focus:outline-none"
-							value={newMessage}
-							onChange={(e) => setNewMessage(e.target.value)}
+							value={message}
+							onChange={(e) => setMessage(e.target.value)}
 						/>
 						<button
 							className="bg-blue-500 text-white p-4 px-12  "
-							onClick={handleSendMessage}
+							onClick={sendMessage}
 						>
 							Send
 						</button>

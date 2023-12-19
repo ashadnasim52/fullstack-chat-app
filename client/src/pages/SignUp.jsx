@@ -15,8 +15,20 @@ const SignUp = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [userName, setuserName] = useState("");
+
+	function comparePasswords() {
+		if (password === confirmPassword) {
+			logger.log("Passwords match and meet the pattern.");
+			return true;
+		} else {
+			showToast("Both Password are not same");
+			return false;
+		}
+	}
+
 	const _handleSignUp = async () => {
 		try {
+			if (!comparePasswords()) return;
 			const { data } = await axiosInstance.post(SIGNUP, {
 				email,
 				password,
@@ -27,7 +39,7 @@ const SignUp = () => {
 				data: data,
 			});
 			showToast(data?.message || "Success", TOAST_SUCCESS);
-			nav("/");
+			nav("/signin");
 			return;
 		} catch (error) {
 			console.log({ error });
@@ -49,44 +61,86 @@ const SignUp = () => {
 				</div>
 			</div>
 
-			{/* Right side with sign-in card */}
 			<div className="flex-1 flex items-center justify-center p-8">
-				<div className="bg-secondarycolor text-white p-8 rounded rounded-md shadow-md w-96">
+				<div className="bg-secondarycolor text-white p-8 rounded rounded-md shadow-md  grid grid-cols-1 gap-4">
 					<h2 className="text-2xl font-bold mb-6">Sign Up</h2>
-					<div className="mb-4">
-						<label
-							htmlFor="email"
-							className="block text-gray-600 font-semibold mb-2"
-						>
-							Email
-						</label>
-						<input
-							type="email"
-							id="email"
-							name="email"
-							className="w-full border rounded-md py-2 px-3"
-						/>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+						<div>
+							<label
+								htmlFor="username"
+								className="block text-gray-600 font-semibold mb-2"
+							>
+								Username
+							</label>
+							<input
+								type="text"
+								id="username"
+								name="username"
+								value={userName}
+								onChange={(e) => setuserName(e.target.value)}
+								className="w-full border rounded-md py-2 px-3 text-black"
+							/>
+						</div>
+						<div>
+							<label
+								htmlFor="email"
+								className="block text-gray-600 font-semibold mb-2"
+							>
+								Email
+							</label>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								className="w-full border rounded-md py-2 px-3 text-black"
+							/>
+						</div>
 					</div>
-					<div className="mb-6">
-						<label
-							htmlFor="password"
-							className="block text-gray-600 font-semibold mb-2"
-						>
-							Password
-						</label>
-						<input
-							type="password"
-							id="password"
-							name="password"
-							className="w-full border rounded-md py-2 px-3"
-						/>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+						<div>
+							<label
+								htmlFor="password"
+								className="block text-gray-600 font-semibold mb-2"
+							>
+								Password
+							</label>
+							<input
+								type="password"
+								id="password"
+								name="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								className="w-full border rounded-md py-2 px-3 text-black"
+							/>
+						</div>
+						<div>
+							<label
+								htmlFor="confirmPassword"
+								className="block text-gray-600 font-semibold mb-2"
+							>
+								Confirm Password
+							</label>
+							<input
+								type="password"
+								id="confirmPassword"
+								value={confirmPassword}
+								onChange={(e) => setConfirmPassword(e.target.value)}
+								name="confirmPassword"
+								className="w-full border rounded-md py-2 px-3 text-black"
+							/>
+						</div>
 					</div>
-					<button className="bg-accentcolor text-white rounded-md py-2 px-4 w-full">
-						Sign In
+					<button
+						onClick={_handleSignUp}
+						className="bg-accentcolor text-white rounded-md py-2 px-4 w-full"
+					>
+						Sign Up
 					</button>
 					<p className="text-white mt-4 ">
 						Already have an account?{" "}
-						<Link to={"/signup"} className="underline text-blue-400">
+						<Link to={"/signin"} className="underline text-blue-400">
 							Sign In
 						</Link>
 						.

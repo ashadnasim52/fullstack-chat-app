@@ -16,10 +16,11 @@ const Groups = ({ groups }) => {
 			>
 				{groups.map((group) => (
 					<Group
-						key={group.id}
-						groupName={group.groupName}
-						createdBy={group.createdBy}
-						creatorImage={group.creatorImage}
+						key={group?._id}
+						chatId={group?._id}
+						groupName={group?.name}
+						createdBy={group?.createdBy?.userName}
+						creatorImage={group?.createdBy?.avatar}
 					/>
 				))}
 			</div>

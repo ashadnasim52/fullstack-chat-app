@@ -1,8 +1,8 @@
 // src/components/SignIn.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import animationData from "../assets/walk.json";
 import Lottie from "lottie-react";
-import { colors } from "../utils/constant";
+import { SOMETHING_WENT_WRONG, TOAST_SUCCESS, colors } from "../utils/constant";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import {
@@ -15,8 +15,14 @@ import {
 } from "@/components/ui/card";
 import Groups from "../components/Groups";
 import FloatingActionButton from "../components/FloatingActionButton";
+import { ALL_GROUPS, CREATE_GROUP } from "../utils/api";
+import axiosInstance from "../utils/axios";
+import { logger } from "../utils/logger";
+import { showToast } from "../utils/funcs";
+import Swal from "sweetalert2";
 
 const Home = () => {
+	const [groups, setGroups] = useState([]);
 	const style = {
 		height: 500,
 	};
@@ -41,63 +47,51 @@ const Home = () => {
 		],
 	};
 
-	const groupsData = [
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		{
-			id: 1,
-			groupName: "Study Group",
-			createdBy: "John Doe",
-			creatorImage: "/path-to-john-image.jpg",
-		},
-		// Add more group data as needed
-	];
+	const _getAllGroup = async () => {
+		try {
+			const { data } = await axiosInstance.get(ALL_GROUPS);
+			logger.log({
+				data: data,
+			});
+			setGroups(data?.payload);
+		} catch (error) {
+			console.log({ error });
+			showToast(error?.response?.message || SOMETHING_WENT_WRONG);
+		}
+	};
+
+	useEffect(() => {
+		_getAllGroup();
+	}, []);
+
+	const _handleAddGroupClick = async () => {
+		const { value: groupName } = await Swal.fire({
+			title: "Provide Group Name",
+			input: "text",
+			inputLabel: "Your new group name",
+			inputPlaceholder: "example:- XYX",
+		});
+		if (groupName) {
+			// Swal.fire(`Entered groupName: ${groupName}`);
+			_createGroup(groupName);
+		}
+	};
+
+	const _createGroup = async (groupName) => {
+		try {
+			const { data } = await axiosInstance.post(CREATE_GROUP, {
+				name: groupName,
+			});
+			if (data?.error) return showToast(data?.message || SOMETHING_WENT_WRONG);
+			logger.log({
+				data: data,
+			});
+			showToast(data?.message || "Success", TOAST_SUCCESS);
+		} catch (error) {
+			console.log({ error });
+			showToast(error?.response?.message || SOMETHING_WENT_WRONG);
+		}
+	};
 
 	return (
 		<Layout>
@@ -118,11 +112,11 @@ const Home = () => {
 
 				<div className="flex flex-1">
 					{/* <h1 className="text-3xl font-bold mb-4">Groups</h1> */}
-					<Groups groups={groupsData} />
+					<Groups groups={groups} />
 				</div>
 			</div>
 
-			<FloatingActionButton onClick={() => {}} />
+			<FloatingActionButton onClick={_handleAddGroupClick} />
 		</Layout>
 	);
 };

@@ -3,42 +3,15 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
 	{
-		uid: {
+		userName: {
 			type: String,
 		},
-		name: {
-			type: String,
-		},
-		mobileNumber: {
-			type: String,
-		},
-		countryCode: {
+		avatar: {
 			type: String,
 		},
 		email: {
 			type: String,
 		},
-		seller: {
-			type: Schema.Types.ObjectId,
-			ref: 'seller',
-		},
-		profile: {
-			type: Schema.Types.ObjectId,
-			ref: 'profile',
-		},
-		admin: {
-			type: Schema.Types.ObjectId,
-			ref: 'admin',
-		},
-		employee: {
-			type: Schema.Types.ObjectId,
-			ref: 'employee',
-		},
-		isSuperAdmin: {
-			type: Boolean,
-			default: false,
-		},
-
 		isActive: {
 			type: Boolean,
 			default: false,
@@ -47,15 +20,10 @@ const UserSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		isNumberVerifiedUsingOTP: {
-			type: Boolean,
-			default: false,
+		lastSeen: {
+			type: Date,
 		},
-		authType: String,
-		passwordChangedAt: Date,
 		password: String,
-		passwordResetToken: String,
-		passwordResetExpires: Date,
 	},
 	{
 		timestamps: true,

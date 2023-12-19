@@ -11,15 +11,12 @@ opts.secretOrKey = keys;
 
 module.exports = (passport) => {
 	passport.use(
-		'customer-rule',
+		'user-rule',
 		new JwtStrategy(opts, async (payload, done) => {
-			console.log('customer signin');
+			console.log('user signin');
 			const user = await User.findOne({
 				_id: payload._id,
-				role: ROLES.Customer,
-			})
-				.select('_id uid mobileNumber email role name isActive isBanned ')
-				.populate('profile');
+			}).select('_id name userName');
 			console.log({ user });
 			if (!user) return done(null, false);
 			return done(null, user);

@@ -7,6 +7,7 @@ import { showToast } from "../utils/funcs";
 import { logger } from "../utils/logger";
 import axiosInstance from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
+import { setSession } from "../utils/jwt";
 
 const SignIn = () => {
 	const nav = useNavigate();
@@ -25,7 +26,7 @@ const SignIn = () => {
 			});
 			if (data?.token) {
 				setSession(data?.token);
-				nav("/");
+				window.location.href = "/";
 			}
 		} catch (error) {
 			console.log({ error });

@@ -22,7 +22,6 @@ export const globalSlice = createSlice({
 		setAuthData: (state, action) => {
 			state.isAuthenticated = true;
 			state.authData = action.payload;
-			state.isLoading = false;
 		},
 		logOut: () => initialState,
 	},
