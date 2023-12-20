@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import animationData from "../assets/login.json";
 import Lottie from "lottie-react";
 import { SOMETHING_WENT_WRONG, colors } from "../utils/constant";
@@ -8,9 +8,18 @@ import { logger } from "../utils/logger";
 import axiosInstance from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
 import { setSession } from "../utils/jwt";
+import { useSelector } from "react-redux";
 
 const SignIn = () => {
 	const nav = useNavigate();
+	const { isAuthenticated, isLoading, authData } = useSelector(
+		(state) => state.global
+	);
+	useEffect(() => {
+		if (isAuthenticated) {
+			nav("/");
+		}
+	}, [isAuthenticated]);
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");

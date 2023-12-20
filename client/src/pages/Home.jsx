@@ -87,6 +87,7 @@ const Home = () => {
 				data: data,
 			});
 			showToast(data?.message || "Success", TOAST_SUCCESS);
+			_getAllGroup();
 		} catch (error) {
 			console.log({ error });
 			showToast(error?.response?.message || SOMETHING_WENT_WRONG);
@@ -95,11 +96,17 @@ const Home = () => {
 
 	return (
 		<Layout>
-			<div className="flex bg-secondarycolor h-full">
+			<div className="flex flex-col lg:flex-row bg-secondarycolor h-full">
+				{/* Right side with card */}
+				<div className="lg:flex-1">
+					<div className="p-4">
+						{/* <h1 className="text-3xl font-bold mb-4">Groups</h1> */}
+						<Groups groups={groups} />
+					</div>
+				</div>
+
 				{/* Left side with image and text */}
-				<div
-					className={`flex-1 bg-secondarycolor p-8 flex items-center justify-center`}
-				>
+				<div className="lg:flex-1 bg-secondarycolor p-8 flex items-center justify-center">
 					<div className="text-white text-center">
 						<Lottie
 							animationData={animationData}
@@ -108,11 +115,6 @@ const Home = () => {
 							// interactivity={interactivity}
 						/>
 					</div>
-				</div>
-
-				<div className="flex flex-1">
-					{/* <h1 className="text-3xl font-bold mb-4">Groups</h1> */}
-					<Groups groups={groups} />
 				</div>
 			</div>
 

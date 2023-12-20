@@ -4,7 +4,12 @@ import Group from "./Group";
 
 const Groups = ({ groups }) => {
 	return (
-		<div className="overflow-y-auto  bg-darkblackcolor text-white p-4 m-10 rounded-md shadow-md mb-4 w-full h-70 ">
+		<div
+			className="overflow-y-auto  bg-darkblackcolor text-white p-4 m-0 rounded-md shadow-md mb-4 w-full "
+			style={{
+				minHeight: "80vh",
+			}}
+		>
 			<h2 className="text-xl font-bold mb-2 text-center p-2">
 				Join Any Group{" "}
 			</h2>

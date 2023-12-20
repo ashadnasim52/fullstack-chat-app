@@ -3,12 +3,14 @@ import Header from "./Header";
 
 const Layout = ({ children }) => {
 	return (
-		<div className="bg-darkblackcolor relative">
+		<div className="bg-secondarycolor relative">
 			<Header />
 			<div
 				style={{
+					marginTop: "8vh",
 					height: "92vh",
 				}}
+				// className="min-h-screen"
 			>
 				{children}
 			</div>

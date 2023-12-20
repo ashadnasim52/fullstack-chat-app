@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import animationData from "../assets/login.json";
 import Lottie from "lottie-react";
 import { SOMETHING_WENT_WRONG, TOAST_SUCCESS, colors } from "../utils/constant";
@@ -7,10 +7,18 @@ import { showToast } from "../utils/funcs";
 import { logger } from "../utils/logger";
 import axiosInstance from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const SignUp = () => {
 	const nav = useNavigate();
-
+	const { isAuthenticated, isLoading, authData } = useSelector(
+		(state) => state.global
+	);
+	useEffect(() => {
+		if (isAuthenticated) {
+			nav("/");
+		}
+	}, [isAuthenticated]);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");

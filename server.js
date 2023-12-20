@@ -129,14 +129,16 @@ io.on('connection', (socket) => {
 		try {
 			// Find the group and add the user to the members
 			const group = await Group.findById(groupId);
-			// if (
-			// 	group.members.includes(
-			// 		(member) => member._id.toString() !== socket.user._id.toString()
-			// 	)
-			// ) {
-			group.members.push(socket.user._id);
-			await group.save();
-			// }
+			// Check if the user is not already a member
+			if (
+				!group.members.some(
+					(member) => member._id.toString() === socket.user._id.toString()
+				)
+			) {
+				group.members.push(socket.user._id);
+				await group.save();
+			}
+
 			socket.join(groupId);
 
 			io.to(groupId).emit(
@@ -219,14 +221,31 @@ io.on('connection', (socket) => {
 	});
 
 	// Handle disconnections
-	socket.on('disconnect', () => {
-		console.log(`User ${socket.user.userName} disconnected: ${socket.id}`);
-		User.findOneAndUpdate(
-			{ _id: socket.user._id },
-			{
-				lastSeen: Date.now(),
-			}
-		);
+	socket.on('disconnect', async () => {
+		try {
+			// const user = await User.findById(socket.user._id);
+			// if (user) {
+			// 	const groups = await Group.find({ members: user._id });
+			// 	groups.forEach(async (group) => {
+			// 		group.members.pull(user._id);
+			// 		await group.save();
+			// 		io.to(group._id).emit(
+			// 			'participantsUpdated',
+			// 			await getParticipants(group._id)
+			// 		);
+			// 	});
+			// }
+			console.log(`User ${socket.user.userName} disconnected: ${socket.id}`);
+			User.findOneAndUpdate(
+				{ _id: socket.user._id },
+				{
+					lastSeen: Date.now(),
+				}
+			);
+			console.log(`User ${socket.user.username} disconnected: ${socket.id}`);
+		} catch (error) {
+			console.error('Error handling disconnect:', error.message);
+		}
 	});
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Layout from "../components/Layout";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { useParams } from "react-router-dom";
@@ -21,10 +21,22 @@ const Chat = () => {
 		(state) => state.global
 	);
 	const [message, setMessage] = useState("");
+	const [isJoined, setIsJoined] = useState(false);
 	const [groupData, setGroupData] = useState([]);
 	const [chats, setChats] = useState([]);
 	const [newMessage, setNewMessage] = useState("");
 	let { id } = useParams(); // Unpacking and retrieve id
+	const chatContainerRef = useRef(null);
+	const scrollToBottom = () => {
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTop =
+				chatContainerRef.current.scrollHeight;
+		}
+	};
+
+	useEffect(() => {
+		scrollToBottom();
+	}, [chats]);
 	// const handleSendMessage = () => {
 	// 	const newChat = {
 	// 		id: Date.now(),
@@ -121,6 +133,7 @@ const Chat = () => {
 		socket.connect();
 		// Emit joinGroup event to server
 		socket.emit("joinGroup", id);
+		setIsJoined(true);
 	};
 
 	// const sendMessage = () => {
@@ -140,15 +153,41 @@ const Chat = () => {
 		socket.emit("groupMessage", { groupId: id, message: message });
 		setMessage("");
 	};
+	if (!isJoined)
+		return (
+			<Layout>
+				<div className="min-h-screen flex flex-col justify-center items-center bg-secondarycolor">
+					<button
+						onClick={joinGroup}
+						className="bg-accentcolor h-14 text-white rounded-md py-2 px-10 hover:bg-accentcolor-dark focus:outline-none focus:shadow-outline"
+					>
+						Join Group {groupData?.name}
+					</button>{" "}
+					<p className="font-bold text-sm text-white mt-10">
+						{groupData?.name} has {groupData?.members?.length} member and
+						growing
+					</p>
+				</div>
+			</Layout>
+		);
 	return (
 		<Layout>
-			<div className="flex h-100 bg-secondarycolor">
+			<div
+				className="flex  bg-secondarycolor"
+				style={{
+					maxHeight: "92vh",
+				}}
+			>
 				{/* Participants List (Left Side) */}
-				<div className="w-1/4 bg-darkblackcolor text-white p-4 border-r h-100 overflow-y-auto">
-					<h2 className="text-xl font-bold mb-4">Participants</h2>
-					<button onClick={joinGroup}>Join Group</button>
+				<div
+					className="w-1/4 bg-darkblackcolor text-white p-4 border-r  overflow-y-auto"
+					style={{
+						height: "92vh",
+					}}
+				>
 					{/* <button onClick={sendMessage}>Send Message</button> */}
 
+					<h2 className="text-xl font-bold mb-4">Participants</h2>
 					{participants.map((participant) => (
 						<div className="flex items-center mb-4">
 							<Avatar className="h-9 w-9">
@@ -170,7 +209,13 @@ const Chat = () => {
 
 				<div className="flex-1 p-4 overflow-y-auto relative">
 					{/* Chat Messages */}
-					<div className="flex flex-col">
+					<div
+						ref={chatContainerRef}
+						className="flex flex-col overflow-y-auto pb-10"
+						style={{
+							height: "92vh",
+						}}
+					>
 						{chats.map((chat) => (
 							<div
 								key={chat.id}

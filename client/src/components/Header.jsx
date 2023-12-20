@@ -1,6 +1,7 @@
 // src/components/Header.js
-import React, { useState } from "react";
-import { FaCog, FaMailBulk, FaSignOutAlt } from "react-icons/fa"; // Import icons from react-icons (you can choose your preferred icon library)
+
+import React from "react";
+import { LogOut, Github, LifeBuoy, Cloud } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,37 +14,18 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import Logo from "../assets/logo.svg";
-import {
-	Cloud,
-	CreditCard,
-	Github,
-	Keyboard,
-	LifeBuoy,
-	LogOut,
-	Mail,
-	MessageSquare,
-	Plus,
-	PlusCircle,
-	Settings,
-	User,
-	UserPlus,
-	Users,
-} from "lucide-react";
-import { Provider, useDispatch, useSelector } from "react-redux";
 import { setSession } from "../utils/jwt";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Header = () => {
-	const { isAuthenticated, isLoading, authData } = useSelector(
-		(state) => state.global
-	);
+	const { authData } = useSelector((state) => state.global);
 	const nav = useNavigate();
 
 	return (
 		<header
-			className="bg-darkblackcolor p-4 px-10 flex justify-between items-center fixed w-100 right-0 left-0 top-0"
+			className="bg-darkblackcolor p-4 px-5 md:px-10 flex justify-between items-center fixed w-full top-0"
 			style={{
-				height: "8vh",
 				zIndex: 111,
 			}}
 		>
