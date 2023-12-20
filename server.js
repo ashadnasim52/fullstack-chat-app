@@ -18,7 +18,14 @@ const jwt = require('jsonwebtoken');
 // const io = require('socket.io')(server);
 
 // Use Helmet middleware for securing HTTP headers
-app.use(helmet());
+app.use(
+	helmet.contentSecurityPolicy({
+		useDefaults: true,
+		directives: {
+			'img-src': ["'self'", 'https: data:'],
+		},
+	})
+);
 app.use(cors());
 app.use(express.json());
 app.use(
@@ -69,6 +76,7 @@ const authRoute = require('./routes/auth');
 const groupRoute = require('./routes/group');
 const Group = require('./model/Group');
 const User = require('./model/User');
+const path = require('path');
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/group', groupRoute);
 const keys = process.env.SECRET || '';
@@ -186,3 +194,10 @@ const getParticipants = async (groupId) => {
 	);
 	return groups;
 };
+
+app.use(express.static(path.join(__dirname, 'client/dist')));
+
+// For all other requests, serve the Vite React app
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+});
