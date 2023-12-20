@@ -12,7 +12,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
 import useIsMobile from "../components/hooks/useIsMobile";
 
-const URL = "";
+const URL = "/";
 const socket = io(URL, {
 	autoConnect: false,
 	auth: { token: `${localStorage.getItem(TOKEN)}` },
