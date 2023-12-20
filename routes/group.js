@@ -14,6 +14,4 @@ router.post(
 	groupController.createGroup
 );
 
-// router.delete('/join-group', groupController.joinGroup);
-
 module.exports = router;

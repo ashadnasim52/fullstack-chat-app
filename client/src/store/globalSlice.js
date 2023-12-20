@@ -4,7 +4,6 @@ const initialState = {
 	isAuthenticated: false,
 	isLoading: true,
 	authData: null,
-	globalData: null,
 };
 export const globalSlice = createSlice({
 	name: "global",
@@ -12,11 +11,6 @@ export const globalSlice = createSlice({
 	reducers: {
 		setAuthentication: (state, action) => {
 			state.isAuthenticated = action.payload;
-			state.isLoading = false;
-		},
-		setGlobalData: (state, action) => {
-			// state.isLoading = false;
-			state.globalData = action.payload;
 			state.isLoading = false;
 		},
 		setAuthData: (state, action) => {
@@ -27,7 +21,6 @@ export const globalSlice = createSlice({
 	},
 });
 
-export const { setAuthentication, setGlobalData, setAuthData, logOut } =
-	globalSlice.actions;
+export const { setAuthentication, setAuthData, logOut } = globalSlice.actions;
 
 export default globalSlice.reducer;

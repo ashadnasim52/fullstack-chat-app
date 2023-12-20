@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
 			<Header />
 			<div
 				style={{
-					marginTop: "8vh",
+					marginTop: "7vh",
 					height: "92vh",
 				}}
 				// className="min-h-screen"

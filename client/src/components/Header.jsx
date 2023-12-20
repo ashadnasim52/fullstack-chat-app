@@ -1,5 +1,3 @@
-// src/components/Header.js
-
 import React from "react";
 import { LogOut, Github, LifeBuoy, Cloud } from "lucide-react";
 import {
@@ -29,7 +27,6 @@ const Header = () => {
 				zIndex: 111,
 			}}
 		>
-			{/* Left side with logo and text */}
 			<div className="flex items-center">
 				<img src={Logo} alt="GenZ Logo" className="w-8 h-8 mr-2" />
 				<span className="text-white font-bold text-lg">GenZ Chat App</span>
@@ -64,12 +61,11 @@ const Header = () => {
 					<DropdownMenuItem
 						onClick={() => {
 							setSession();
-							nav("/sign");
+							nav("/signin");
 						}}
 					>
 						<LogOut className="mr-2 h-4 w-4" />
 						<span>Log out</span>
-						<DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
 					</DropdownMenuItem>{" "}
 				</DropdownMenuContent>
 			</DropdownMenu>

@@ -43,11 +43,8 @@ const SignIn = () => {
 		}
 	};
 	return (
-		<div className="flex h-screen bg-darkblackcolor">
-			{/* Left side with image and text */}
-			<div
-				className={`flex-1 bg-darkblackcolor p-8 flex items-center justify-center`}
-			>
+		<div className="flex flex-col lg:flex-row h-screen bg-darkblackcolor">
+			<div className="lg:flex-1 bg-darkblackcolor p-8 flex items-center justify-center">
 				<div className="text-white text-center">
 					<Lottie animationData={animationData} loop={true} />
 					<div className="text-pink text-center">
@@ -57,9 +54,8 @@ const SignIn = () => {
 				</div>
 			</div>
 
-			{/* Right side with sign-in card */}
-			<div className="flex-1 flex items-center justify-center p-8">
-				<div className="bg-secondarycolor text-white p-8 rounded rounded-md shadow-md w-96">
+			<div className="lg:flex-1 flex items-center justify-center p-8">
+				<div className="bg-secondarycolor text-white p-8 rounded-md shadow-md w-full lg:w-96">
 					<h2 className="text-2xl font-bold mb-6">Sign In</h2>
 					<div className="mb-4">
 						<label
@@ -101,7 +97,7 @@ const SignIn = () => {
 					</button>
 					<p className="text-white mt-4 ">
 						Don't have an account?{" "}
-						<Link to={"/signup"} className="underline text-blue-400">
+						<Link to="/signup" className="underline text-blue-400">
 							Create one
 						</Link>
 						.

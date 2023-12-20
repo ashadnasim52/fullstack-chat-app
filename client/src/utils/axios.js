@@ -9,7 +9,6 @@ const axiosInstance = axios.create({
 	baseURL: BASE_URL,
 	headers: {
 		"Content-Type": "application/json",
-		// any other default headers
 	},
 });
 
@@ -32,11 +31,9 @@ axiosInstance.interceptors.response.use(
 			console.log(error);
 			setSession();
 			store.dispatch(logOut());
-			// showToast('Please Signin again, something went wrong');
 		} else if (error?.status === 503 || error?.response?.status === 503) {
 			setSession();
 			store.dispatch(logOut());
-			// showToast('Please Signin again, something went wrong');
 		} else {
 			return Promise.reject(
 				(error?.response && error?.response?.data) || "Something went wrong"

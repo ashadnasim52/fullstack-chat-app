@@ -1,4 +1,3 @@
-// src/components/GroupCard.js
 import React from "react";
 import Group from "./Group";
 
@@ -11,7 +10,7 @@ const Groups = ({ groups }) => {
 			}}
 		>
 			<h2 className="text-xl font-bold mb-2 text-center p-2">
-				Join Any Group{" "}
+				Enter Room & Discuss something new
 			</h2>
 			<div
 			// className="overflow-y-auto "

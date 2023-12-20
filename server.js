@@ -53,14 +53,11 @@ const io = new Server(server, {
 	},
 });
 
-// Express Rate Limit middleware
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // limit each IP to 100 requests per windowMs
+	max: 100, // 100 requests max
 });
 app.use(limiter);
-
-// Your routes and other middleware can be added here
 
 const PORT = process.env.PORT || 3000;
 
@@ -80,10 +77,9 @@ io.use(async (socket, next) => {
 	try {
 		const token = socket.handshake.auth.token;
 		console.log(token);
-		const decoded = jwt.verify(token, keys); // Replace with your secret key
+		const decoded = jwt.verify(token, keys);
 		console.log(decoded);
 
-		// Attach the user details to the socket object
 		socket.user = decoded;
 
 		return next();
@@ -93,43 +89,12 @@ io.use(async (socket, next) => {
 	}
 });
 
-// io.on('connection', (socket) => {
-// 	console.log('user connected');
-// 	// socket.on('join', (userName) => {
-// 	// 	console.log('joineddd...');
-// 	// 	console.log(userName);
-
-// 	// 	socket.on('message', (messageText) => {
-// 	// 		console.log(`messageText recieved is ${messageText} from ${userName}`);
-// 	// 		socket.emit('messageRecieved', {});
-// 	// 	});
-// 	// });
-// 	socket.on('joinGroup', (groupId) => {
-// 		socket.join(groupId);
-// 		console.log(`User ${socket.id} joined group ${groupId}`);
-// 	});
-
-// 	socket.on('groupMessage', (data) => {
-// 		console.log(`groupMessage recieved`);
-// 		console.log(data);
-
-// 		io.to(data.groupId).emit('groupMessage', data);
-// 	});
-
-// 	socket.on('disconnect', () => {
-// 		console.log('user left ' + socket.id);
-// 	});
-// });
-
 io.on('connection', (socket) => {
 	console.log(`User ${socket.user.userName} connected: ${socket.id}`);
 
-	// Handle joining a group
 	socket.on('joinGroup', async (groupId) => {
 		try {
-			// Find the group and add the user to the members
 			const group = await Group.findById(groupId);
-			// Check if the user is not already a member
 			if (
 				!group.members.some(
 					(member) => member._id.toString() === socket.user._id.toString()
@@ -152,39 +117,12 @@ io.on('connection', (socket) => {
 		}
 	});
 
-	// Handle group messages
-	// socket.on('groupMessage', (data) => {
-	// 	console.log(data);
-	// 	// io.to(data.groupId).emit('messages', {
-	// 	// 	message: data.message,
-	// 	// 	sender: socket.user._id,
-	// 	// 	userName: socket.user.userName,
-	// 	// 	avatar: socket.user.avatar,
-	// 	// 	date: Date.now(),
-	// 	// });
-	// 	Group.findOneAndUpdate(
-	// 		{ _id: data.groupId },
-	// 		{
-	// 			$push: {
-	// 				chats: {
-	// 					message: data.message,
-	// 					sender: socket.user._id,
-	// 					userName: socket.user.userName,
-	// 					avatar: socket.user.avatar,
-	// 					date: Date.now(),
-	// 				},
-	// 			},
-	// 		}
-	// 	);
-	// });
-
 	socket.on('groupMessage', async (data) => {
 		try {
 			const group = await Group.findById(data.groupId);
 			console.log({
 				groupMessage: data,
 			});
-			// If the sender is a member of the group, broadcast the message to the group
 			io.to(data.groupId).emit('groupMessage', {
 				message: data.message,
 				sender: socket.user._id,
@@ -192,14 +130,7 @@ io.on('connection', (socket) => {
 				avatar: socket.user.avatar,
 				date: Date.now(),
 			});
-			// console.log({
-			// 	ID: data.groupId,
-			// 	message: data.message,
-			// 	sender: socket.user._id,
-			// 	userName: socket.user.userName,
-			// 	avatar: socket.user.avatar,
-			// 	date: Date.now(),
-			// });
+
 			const updated = await Group.findOneAndUpdate(
 				{ _id: data.groupId },
 				{
@@ -214,7 +145,6 @@ io.on('connection', (socket) => {
 					},
 				}
 			);
-			// console.log({ updated });
 		} catch (error) {
 			console.error('Error sending group message:', error.message);
 		}

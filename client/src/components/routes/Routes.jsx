@@ -1,4 +1,3 @@
-// src/Routes.js
 import React from "react";
 import Home from "../../pages/Home";
 import About from "../../pages/About";
@@ -6,11 +5,8 @@ import SignUp from "../../pages/SignUp";
 import SignIn from "../../pages/SignIn";
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import Chat from "../../pages/Chat";
-import { Provider, useDispatch, useSelector } from "react-redux";
 
 const Navigations = () => {
-	const { isAuthenticated, isLoading } = useSelector((state) => state.global);
-
 	return (
 		<div>
 			<Routes>
